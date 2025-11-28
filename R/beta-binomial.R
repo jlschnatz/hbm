@@ -189,7 +189,7 @@ p_priors <- data.frame(
         expand = expansion()
       )
     )
-  ) + 
+  ) +
   theme_linedraw(base_family = "Optima") +
   theme(
     plot.margin = margin(10, 10, 10, 10),
@@ -424,7 +424,7 @@ for (i in seq_len(nrow(sim_values))) {
     mu,
     phi,
     title = paste0("Posterior of Hyperparameters"),
-    log_phi = TRUE
+    #log_phi = TRUE
   ) +
     facetted_pos_scales(
       x = list(
@@ -434,7 +434,7 @@ for (i in seq_len(nrow(sim_values))) {
           expand = expansion()
         ),
         phi = scale_x_continuous(
-          limits = c(-3, 3),
+          limits = c(0, 4),
           breaks = scales::breaks_pretty(n = 6),
           expand = expansion(),
         )
@@ -444,7 +444,7 @@ for (i in seq_len(nrow(sim_values))) {
           labels = c(TeX("$\\frac{\\alpha}{\\alpha + \\beta}$"))
         ),
         phi = scale_y_discrete(
-          labels = c(TeX("$\\ln(\\alpha + \\beta)$"))
+          labels = c(TeX("$\\alpha + \\beta$"))
         )
       )
     )

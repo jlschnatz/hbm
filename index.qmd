@@ -550,6 +550,9 @@ This is the mathematical definition of "Sharing Statistical Strength."By integra
 
 :::
 
+
+::: {.fragment}
+
 Applying Bayes Formula to HBM
 
 $$
@@ -558,6 +561,10 @@ $$
 \underbrace{P(\alpha, \beta)}_{\text{Hyperprior}} \overbrace{P(\theta ~ | ~ \alpha, \beta)}^{\text{Conditional Prior}} \underbrace{P(y ~ | ~ \theta, \alpha, \beta)}_{\text{Likelihood}}
 \end{gathered}
 $$
+
+:::
+
+::: {.fragment}
 
 Posterior inference regarding $\theta_i$ by integrating out $\alpha$ and $\beta$
 
@@ -568,7 +575,9 @@ P(\theta_i ~ | ~ d_1, \dots, d_n) =
 \end{align*}
 $$
 
-## Implementation {auto-animate="true"}
+:::
+
+## Implementation {auto-animate="true" .hidden}
 
 Numerical integration of equation approximated using Markov Chain Monte Carlo (MCMC) methods, e.g., Hamiltonian-Monte-Carlo (HMC) using STAN:
 
@@ -586,19 +595,27 @@ cat(readLines("stan/beta-binomial.stan"), sep = "\n")
 ::: {.notes}
 
 - These are the results of fitting the model we formalized using HMC with STAN to the marble data I showed you
-- We read the model from left to right 
-  - On the left you see a repetition of the data we obtained
+- We read the model hierarchy from left to right 
+  - On the left you see a repetition of the marbles we obtained
   - The middle panel shows the posterior distributions of $\theta_i$ parameters for each bag (y-axis)
   - The right panel shows the posterior distributions for the hyperparameters $\mu$ and $\phi$
-- When we zoom in on the posterior distribution for $\theta_8$ for the 8th bag, we see that the hierachical bayesian model captures our intuition $\rightarrow$ high certainty a high probability of drawing a black marble for the 8th bag
+- Figures show learning from the 7 previous bags of marbles incluences the inference about the new bag from which the single black marble was drawn
+- If we zoom in on the posterior distribution for $\theta_8$ for the 8th bag, we see that the hierachical bayesian model captures our intuition $\rightarrow$ high certainty that probability of drawing a black marble is near one for the 8th bag
+- How was the model able to make this inference? To find out we have to look that the level three inferences about the $\alpha$ and $\beta$ variables [Zoom in]
+- Posterior on $\alpha + \beta$ is close to zero, which means that the learned the overhypothesis that the bags tend to be homogenous in color
+- Posterior on $\alpha / (\alpha + \beta)$ is centered around 0.5, which means that roughly half of the marble in the population of bags will be black and half white.
+
   
 Second figure:
 
 - To show what the model would predict, if it had seen different data, I additionally simulate a second marble scenario
 - What you can see in the left panel, two key aspects:
   - On average there seems to be less than 50% black marbles across the bags (in the first example it was roughly 50%)
-  - The bags are now way less homogenous $\rightarrow$ lower variance / higher precision
-- 
+  - The bags are now way less homogenous $\rightarrow$ there tend to be both white and black marbles in each bag
+
+- The shift in the average probability of drawing a black marble is reflected in the $\alpha / (\alpha + \beta)$, which is now shifted to the left of 0.5 $\rightarrow$ model has inferred that there are fewer black marbles that white marbles across the entire population of bags
+- The posterior distribution of $\alpha + \beta$ indicates that in comparison to the previous example, the parameters are relatively larger (greater than 1), which indicates that the bags of marbles are expected to contain a mix of black and white marbles (so they are heterogeneous)
+- This explains why now the model predicts in the posterior distribution for $\theta_8$, that the probability of drawing a black marble in bag 8 is probably not close to 1, and additionally there is high uncertainty
 
 :::
 
