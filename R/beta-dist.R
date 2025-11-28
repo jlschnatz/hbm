@@ -5,7 +5,8 @@ pacman::p_load(
   tidyr,
   gifski,
   systemfonts,
-  ragg
+  ragg,
+  ggtext
 )
 
 # 1. Define Waypoints
@@ -69,13 +70,14 @@ p <- ggplot(expanded_data, aes(x = x, y = y)) +
   labs(
     title = "Beta Distribution",
     y = "Density",
-    x = "x"
+    x = "P(<theta;<sub>i</sub>)"
   ) +
   coord_cartesian(ylim = c(0, 10), expand = FALSE) +
   theme_light(base_family = "Optima") +
   theme(
     plot.title = element_text(size = 18, face = "bold"),
     axis.title = element_text(size = 12),
+    axis.title.x = element_markdown(),
     element_text(family = "Optima"),
     # Remove standard subtitle space since we are using geom_text
     plot.subtitle = element_blank()

@@ -176,10 +176,28 @@ p_priors <- data.frame(
     expand = expansion(),
     limits = c(0, 1.5)
   ) +
+  ggh4x::facetted_pos_scales(
+    x = list(
+      `&mu; ~ unif(0, 1)` = scale_x_continuous(
+        limits = c(0, 1),
+        breaks = seq(0, 1, 0.2),
+        expand = expansion()
+      ),
+      `&phi; ~ exp(1)` = scale_x_continuous(
+        limits = c(0, 8),
+        breaks = seq(0, 8, 2),
+        expand = expansion()
+      )
+    )
+  ) + 
   theme_linedraw(base_family = "Optima") +
   theme(
     plot.margin = margin(10, 10, 10, 10),
-    strip.text = element_markdown(color = "white", size = 11),
+    axis.title.y = element_text(size = 25),
+    axis.text = element_text(size = 22),
+    axis.text.y = element_text(margin = margin(l = 0, r = -5)),
+    axis.text.x = element_text(margin = margin(t = 5)),
+    strip.text = element_markdown(color = "white", size = 25),
     strip.background = element_rect(fill = "black"),
     axis.text.y.left = element_text(margin = margin(r = 10))
   )

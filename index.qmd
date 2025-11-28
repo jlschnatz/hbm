@@ -250,6 +250,11 @@ $d_i:  \big\{y_i, n_i \big\}$
 
 ::: {.column width="35%"}
 $y_i ~ \big| ~ n_i \sim \text{Binom}(\theta_i)$
+
+<br>
+
+![](/img/binomial_distribution_tour.gif)
+
 :::
 :::::
 
@@ -271,7 +276,7 @@ $y_i ~ \big| ~ n_i \sim \text{Binom}(\theta_i)$
 We have $i$ bags of marbles, where $y_i$ is the number of black marbles observed and $n_i$ is the total marbles drawn.
 
 :::::: {.columns .valign}
-::: {.column .column width="50%"}
+::: {.column .column width="65%"}
 **Level 1 – Data**
 :::
 
@@ -279,12 +284,10 @@ We have $i$ bags of marbles, where $y_i$ is the number of black marbles observed
 $d_i:  \big\{y_i, n_i \big\}$
 :::
 
-::: {.column .column width="15%"}
-:::
 ::::::
 
 :::::: {.columns .valign}
-::: {.column .column width="50%"}
+::: {.column .column width="65%"}
 **Level 2 – Bag-specific distribution**
 :::
 
@@ -292,12 +295,10 @@ $d_i:  \big\{y_i, n_i \big\}$
 $y_i ~ \big| ~ n_i \sim \text{Binom}(\theta_i)$
 :::
 
-::: {.column .column width="15%"}
-:::
 ::::::
 
 :::::: columns
-::: {.column width="50%"}
+::: {.column width="65%"}
 **Level 3 – General knowledge about bags**
 :::
 
@@ -305,9 +306,6 @@ $y_i ~ \big| ~ n_i \sim \text{Binom}(\theta_i)$
 $\theta_i \sim \text{Beta}(\alpha, \beta)$
 :::
 
-::: {.column width="15%"}
-![][9]
-:::
 ::::::
 
 ## Formalizing the Problem {auto-animate="true"}
@@ -323,7 +321,6 @@ $\theta_i \sim \text{Beta}(\alpha, \beta)$
 - This "Precision" is exactly what we learned in the marble example: we learned the bags were "low precision" (highly variable)
 
 :::
-
 
 We have $i$ bags of marbles, where $y_i$ is the number of black marbles observed and $n_i$ is the total marbles drawn.
 
@@ -360,7 +357,7 @@ Reparamerization as
 ::: {.column width="35%"}
 $\theta_i \sim \text{Beta}(\alpha, \beta)$
 
-![](/gif/beta_distribution_tour.gif)
+![](/img/beta_distribution_tour.gif)
 
 :::
 :::::
@@ -479,6 +476,8 @@ $\theta_i \sim \text{Beta}(\alpha, \beta)$
 $\frac{\alpha}{\alpha + \beta} \sim \text{Unif}(0, 1)$
 
 $\alpha + \beta \sim \text{Exp}(1)$
+
+![](figures/priors.png)
 :::
 :::::
 
