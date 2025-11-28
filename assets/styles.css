@@ -1,0 +1,173 @@
+/* ====== Base Layout ====== */
+
+.larger {
+    font-size: 1.3em !important;
+}
+
+.narrow {
+    width: 60% !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.small_codeblock {
+    font-size: 0.9em !important;
+}
+
+/* Make all images scale to available space */
+.reveal section img.auto-fit {
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+  width: auto;
+  object-fit: contain;
+}
+
+.reveal table {
+  font-size: smaller;
+}
+
+/* 1. The Container: Forces side-by-side layout (Row) & aligns columns vertically */
+.valign {
+  display: flex !important;
+  flex-direction: row !important; /* Forces columns to be next to each other */
+  align-items: center !important;
+}
+
+/* 2. The Columns: Centers the content inside each column vertically */
+.valign .column {
+  display: flex !important;
+  align-items: center !important; /* Centers text/image vertically inside the column */
+}
+
+/* Reduce default margins/spacing on images within the aligned columns */
+.valign .column img {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0; 
+}
+
+/* Reduce bottom margin of figures */
+.reveal figure {
+  margin-bottom: 0.2em !important; /* Default is often roughly 1em */
+}
+
+/* Reduce vertical spacing of images specifically if they aren't in figures */
+.reveal img {
+  margin: 0 auto 0.2em auto; 
+}
+
+/* Tighten paragraph spacing to pull text closer to the previous element */
+.reveal p {
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+}
+
+.compact p {
+  margin: 0; /* Kills paragraph spacing */
+  font-size: 0.9em; /* Optional: labels usually look better slightly smaller */
+}
+.compact figure {
+  margin-top: 0;
+  margin-bottom: 10px; /* Minimal space after image */
+}
+
+/* Force images in the marble grid to be short */
+.marble-grid img {
+  max-height: 200px !important; /* Adjust this number until text fits */
+  width: auto !important;       /* Maintain aspect ratio */
+  margin: 0 auto !important;    /* Center them if they shrink */
+}
+
+
+.content {
+    padding: 16px;
+    display: none;
+}
+
+.reveal .slides section.nocenter {
+  top: 0 !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
+/* 1. Target the image within your custom container */
+.wide-image-content img {
+    /* Use a very large viewport width to guarantee the size */
+    width: 95vw !important; 
+    
+    /* Center the image and make it a block element */
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* 2. Overthrow the slide's main content wrapper */
+.reveal .slides section div.slide-content,
+.reveal .slides section .r-stack {
+    /* Set max-width to the full slide width to allow breakout */
+    max-width: 100% !important; 
+    
+    /* Remove default padding that shrinks the content area */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    
+    /* Force the content area to the top-left */
+    left: 0 !important;
+    transform: none !important;
+}
+
+/* 3. Ensure your specific content div also has no constraints */
+.reveal .slides section .wide-image-content {
+    max-width: 100% !important;
+    padding: 0 !important;
+}
+
+.panel-tabset [role=tablist] {
+    color: black;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    font-size: 0.75em;
+}
+.panel-tabset [role=tablist] * {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box
+}
+@media(min-width: 30em) {
+    .panel-tabset [role=tablist] li {
+        display:inline-block
+    }
+}
+.panel-tabset [role=tab] {
+    border: 1px solid black;
+    color: black;
+    display: block;
+    padding: .5em 1em;
+    text-decoration: none;
+    background-color: white;
+}
+@media(min-width: 30em) {
+    .panel-tabset [role=tab] {
+            border-top-color:rgba(0,0,0,0); 
+            display: inline-block;
+            color:black;
+        }
+}
+.panel-tabset [role=tab][aria-selected=true] {
+    background-color: #000000ff;
+}
+@media(min-width: 30em) {
+    .panel-tabset [role=tab][aria-selected=true] {
+        color: black;
+        background-color: white;
+        border: 2px solid black;
+    }
+}
+@media(min-width: 30em) {
+    .panel-tabset [role=tab]:hover:not([aria-selected=true]) {
+        border:1px solid black;
+        color: black;
+    }
+}

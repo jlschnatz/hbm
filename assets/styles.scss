@@ -1,0 +1,57 @@
+/*-- scss:defaults --*/
+$link-color: #9a3416;
+$theme-light-back: #fdddb6;
+$theme-light-link: #9a3416;
+$theme-light-text: #222222;
+$theme-dark-back: #1f2e32;
+$theme-dark-link: #aae4e6;
+$theme-dark-text: #ebe8e3;
+
+// fonts
+$font-family-sans-serif: "Optima", serif !default;
+
+// colors
+//$body-bg: #f0f1eb !default;
+//$body-color: #000 !default;
+//$link-color: #51483d !default;
+
+//$selection-bg: #26351c;
+
+// headings
+$presentation-heading-font: "Optima", serif !default;
+$presentation-heading-color: #383d3d !default;
+$presentation-h1-font-size: 1.5em;
+$presentation-h2-font-size: 1.3em;
+$presentation-h3-font-size: 1.2em;
+
+/*-- scss:rules --*/
+
+.reveal a {
+  line-height: 1.2em;
+}
+
+.dark-theme {
+  color: $theme-dark-text;
+  background-color: $theme-dark-back;
+  
+  // header text
+  
+  h1, h2, h3 {
+    color: $theme-dark-text;
+  }
+  
+  // link text
+  
+  a { 
+    color: $theme-dark-link;
+  }
+  
+  // slide background
+  
+  .slide-background-content {
+    background-color: $theme-dark-back;
+  }
+}
+
+
+
