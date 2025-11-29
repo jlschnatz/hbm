@@ -267,7 +267,7 @@ for (i in seq_len(nrow(sim_values))) {
     scale_fill_manual(values = c("black" = "black", "white" = "white")) +
     facet_wrap(~id, ncol = 4) +
     coord_equal() +
-    labs(title = paste0("Marble Composition per Bag")) +
+    labs(title = paste0("Beobachtete Daten")) +
     theme_minimal(base_family = "Optima") +
     theme(
       panel.grid = element_blank(),
@@ -396,7 +396,7 @@ for (i in seq_len(nrow(sim_values))) {
       labels = paste0("Bag ", seq_len(nrow(table_data)))
     ) +
     labs(
-      title = paste0("Posterior Distributions of Bag Thetas"),
+      title = paste0("Posteriore Verteilungen von &theta;y<sub>i</sub>"),
       subtitle = NULL
     ) +
     coord_cartesian(clip = "off") +
@@ -404,7 +404,11 @@ for (i in seq_len(nrow(sim_values))) {
     theme(
       plot.margin = margin(5, 5, 5, 5),
       axis.ticks.y = element_blank(),
-      plot.title = element_text(size = 16, hjust = 0.5, face = "bold"),
+      plot.title = ggtext::element_markdown(
+        size = 16,
+        hjust = 0.5,
+        face = "bold"
+      ),
       axis.title.x = ggtext::element_markdown()
     ) -> p_single_bag_thetas
 
@@ -423,7 +427,7 @@ for (i in seq_len(nrow(sim_values))) {
     samples_mod,
     mu,
     phi,
-    title = paste0("Posterior of Hyperparameters"),
+    title = paste0("Posteriore Verteilung der Hyperparameter"),
     #log_phi = TRUE
   ) +
     facetted_pos_scales(
