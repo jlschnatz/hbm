@@ -434,7 +434,7 @@ for (i in seq_len(nrow(sim_values))) {
           expand = expansion()
         ),
         phi = scale_x_continuous(
-          limits = c(0, 4),
+          limits = c(0, 10),
           breaks = scales::breaks_pretty(n = 6),
           expand = expansion(),
         )

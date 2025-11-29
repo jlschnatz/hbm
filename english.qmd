@@ -1,0 +1,893 @@
+---
+title: "From Marbles to Daxes"
+subtitle: An Introduction to HBMs and their Application to Category Learning"
+author: "Jan Luca Schnatz"
+format:
+  revealjs:
+    slide-number: false
+    css: assets/styles.css
+    chalkboard: false
+    center-title-slide: true
+    progress: true
+    transition: fade
+    embed-resources: true
+    self-contained-math: true
+    smaller: true
+    margin: 0.2
+    center: true
+    auto-stretch: false
+    touch: false
+    auto-animate: true
+    theme: [simple, assets/styles.scss]
+    pointer:
+      key: p
+      pointerSize: 14
+      color: "#000000"
+lightbox: false
+code-block-border-left: true
+mathfont: Tex Gyre Pagella
+html-math-method: mathjax
+bibliography: assets/references.bib
+csl: assets/apa7.csl
+include-after-body: 
+  - file: assets/revealjs-tabset.html
+revealjs-plugins:
+  - pointer
+filters: 
+  - assets/linebreaks.lua
+---
+
+```{r load-packages}
+library(tidyverse)
+library(kableExtra)
+options(knitr.kable.NA = '?')
+```
+
+# Hierarchical Beta-Binomial Model {.dark-theme}
+
+## Motivating Example
+
+::: notes
+- Imagine you and I are drawing repeatedly from bags of black and white marbles
+- Goal: Estimate the probability of drawing a black marbles at a given time
+- We observe the following pattern (sequentially show marble bags)
+- We draw one marble from the eith bag that turns out to be black
+- We could yourselfs the question, _What is the color of the next marble drawn from the 8th bag after observing the pattern I presented to you?_
+- Follow-up question: _How did you arrive at this prediction?_
+:::
+
+Repeatedly draw from bags of black and white marbles with unknown proportion of black marbles:
+
+:::::::::::: marble-grid
+::::::::::: {layout-ncol="4"}
+::: fragment
+![][1]
+:::
+
+::: fragment
+![][2]
+:::
+
+::: fragment
+![][3]
+:::
+
+::: fragment
+![][4]
+:::
+
+::: fragment
+![][5]
+:::
+
+::: fragment
+![][6]
+:::
+
+::: fragment
+![][7]
+:::
+
+::: fragment
+![][8]
+:::
+:::::::::::
+::::::::::::
+
+::: fragment
+1.  What color woud you predict for the next marble drawn from bag 8?
+2.  How did you arrive at that prediction?
+:::
+
+## Intuition {auto-animate="true"}
+
+::: {.notes}
+
+- But think about that for a second. Mathematically, observing one black marble is incredibly weak evidence. If that was the only thing you saw, you shouldn't be confident at all.
+- So why were you confident? Because you didn't look at Bag 8 in isolation. You looked at the context.
+- Having seen that within each bag, colors tend to be homogenous (so either almost completely black or white) makes the single black marble highly informative
+- You noticed a pattern of Homogeneity: The previous bags were never "mixed." They were always almost completely black or completely white.
+- This creates a strong Prior: "Bags tend to be uniform."
+- Now, here is the most important part. It is not just about having "lots of past data."
+- Imagine I took all those previous marbles and dumped them into one giant pile on the floor.
+- You would see a pile that is 50% black and 50% white.
+- If I drew one black marble from that pile, you would predict the next one is... well, probably 50/50.
+- So, the raw data didn't change your mind. The structure did. The fact that the data came in bags is what allows us to learn the abstraction. 
+
+:::
+
+-   One black marble alone gives little information about the color future marbles
+-   But seeing many mostly-black or mostly-white bags before makes that single black marble highly informative
+
+$\rightarrow$ High chance of next marbles also being black!
+
+## Intuition {auto-animate="true"}
+
+::: {.notes}
+
+- So we have established that the grouping – the _hierarchical structure_ – of the data is what matters for this inference
+- Because information at higher levels could be shared across the bags we developed a strong prior expectation of the marble color for the 8th bag after seeing the first marble, and thus we can make precise predictions from these priors 
+- From the computational perspective of David Marr, we need to ask: What is the computational problem the mind is solving here?
+- Our goal is to reverse-engineer this intuition.
+- We want to construct a Bayesian model that captures this reasoning, 
+- To solve this computational problem, we need to translate our "gut feeling" about the bags into a formal probabilistic model.
+- We will build this model from the bottom up, starting with the only thing the mind can actually observe directly
+:::
+
+-   **Hierarchy**
+    -   Information is shared across bags at higher levels
+    -   Observations from previous bags shape strong priors
+    -   These priors influence predictions about new bags
+
+:::: larger
+::: callout-important
+### Goal
+
+We want to build a Bayesian model that *reverse-engineers* the mind‘s reasoning about color distributions across bags.
+:::
+::::
+
+
+## Formalizing the Problem {auto-animate="true"}
+
+We have $i$ bags of marbles, where $y_i$ is the number of black marbles observed and $n_i$ is the total marbles drawn.
+
+## Formalizing the Problem {auto-animate="true"}
+
+::: {.notes}
+
+- Level 1 represents the raw data
+- For any specific bag $i$, we draw a total of $n$ marbles.
+- We observe that $y$ of them are black.
+- This gives us our dataset $d_i$ for that specific bag.
+- At this level, we are just counting what we see.
+
+:::
+
+We have $i$ bags of marbles, where $y_i$ is the number of black marbles observed and $n_i$ is the total marbles drawn.
+
+:::::: {.columns .valign}
+::: {.column .column width="50%"}
+**Level 1 – Data**
+:::
+
+::: {.column .column width="35%"}
+$d_i:  \big\{y_i, n_i \big\}$
+:::
+
+::: {.column .column width="15%"}
+![][1]
+:::
+::::::
+
+## Formalizing the Problem {auto-animate="true"}
+
+::: {.notes}
+
+- Now we ask: What process generated this data
+- ?We assume that each bag has its own specific physical property—the true proportion of black marbles inside it.
+- We call this $\theta_i$ (Theta).
+- Since we are drawing marbles independently with replacement, the data follows a Binomial distribution governed by this specific $\theta_i$.
+- Crucially, at this level, every bag has its own unique $\theta$. One bag might be 100% black ($\theta=1$), another might be 50/50 ($\theta=0.5$).
+
+
+:::
+
+We have $i$ bags of marbles, where $y_i$ is the number of black marbles observed and $n_i$ is the total marbles drawn.
+
+::::: columns
+::: {.column width="65%"}
+**Level 1 – Data**
+:::
+
+::: {.column width="35%"}
+$d_i:  \big\{y_i, n_i \big\}$
+:::
+:::::
+
+::::: columns
+::: {.column width="65%"}
+**Level 2 – Bag-specific distribution**
+:::
+
+::: {.column width="35%"}
+$y_i ~ \big| ~ n_i \sim \text{Binom}(\theta_i)$
+:::
+:::::
+
+## Formalizing the Problem {auto-animate="true"}
+
+::: {.notes}
+
+- Now we ask: What process generated this data
+- ?We assume that each bag has its own specific physical property—the true proportion of black marbles inside it.
+- We call this $\theta_i$ (Theta).
+- Since we are drawing marbles independently with replacement, the data follows a Binomial distribution governed by this specific $\theta_i$.
+- Crucially, at this level, every bag has its own unique $\theta$. One bag might be 100% black ($\theta=1$), another might be 50/50 ($\theta=0.5$).
+
+
+:::
+
+We have $i$ bags of marbles, where $y_i$ is the number of black marbles observed and $n_i$ is the total marbles drawn.
+
+::::: columns
+::: {.column width="65%"}
+**Level 1 – Data**
+:::
+
+::: {.column width="35%"}
+$d_i:  \big\{y_i, n_i \big\}$
+:::
+:::::
+
+::::: columns
+::: {.column width="65%"}
+**Level 2 – Bag-specific distribution**
+
+-   $\theta_i$: Probability of drawing a black marble in bag $i$
+-   Different bags can have different probabilities $\theta_i$
+:::
+
+::: {.column width="35%"}
+$y_i ~ \big| ~ n_i \sim \text{Binom}(\theta_i)$
+
+<br>
+
+![](/img/binomial_distribution_tour.gif)
+
+:::
+:::::
+
+## Formalizing the Problem {auto-animate="true"}
+
+
+::: {.notes}
+
+- If we stopped at Level 2, the bags would be completely unrelated. 
+- Knowing about Bag 1 wouldn't tell us anything about Bag 8.
+- This is the most important level. This is where the learning happens.
+- We assume that all these individual $\theta_i$ values are drawn from a shared Population Distribution.
+- We model this as a Beta Distribution, defined by two parameters: $\alpha$ and $\beta$.
+- It is important to be precise here: We don't have just one $\theta$ for everyone.
+- Rather, for every single bag, we draw a unique $\theta_i$ from this shared parent distribution.
+- This is what allows us to generalize: the bags are independent samples, but they all come from the same "source."
+:::
+
+We have $i$ bags of marbles, where $y_i$ is the number of black marbles observed and $n_i$ is the total marbles drawn.
+
+:::::: {.columns .valign}
+::: {.column .column width="65%"}
+**Level 1 – Data**
+:::
+
+::: {.column .column width="35%"}
+$d_i:  \big\{y_i, n_i \big\}$
+:::
+
+::::::
+
+:::::: {.columns .valign}
+::: {.column .column width="65%"}
+**Level 2 – Bag-specific distribution**
+:::
+
+::: {.column .column width="35%"}
+$y_i ~ \big| ~ n_i \sim \text{Binom}(\theta_i)$
+:::
+
+::::::
+
+:::::: columns
+::: {.column width="65%"}
+**Level 3 – General knowledge about bags**
+:::
+
+::: {.column width="35%"}
+$\theta_i \sim \text{Beta}(\alpha, \beta)$
+:::
+
+::::::
+
+## Formalizing the Problem {auto-animate="true"}
+
+::: {.notes}
+
+- The parameters $\alpha$ and $\beta$ can be hard to visualize. 
+- To make them intuitive, we can re-parameterize them into two concepts:
+  1. The Mean ($\frac{\alpha}{\alpha+\beta}$): This represents the average color across the whole population of bags.
+  2. The Precision ($\alpha + \beta$): This represents how consistent the bags are.
+- High Precision: The distribution is peaked. All bags are very similar to the average.
+- Low Precision: The distribution is U-shaped. Bags vary wildly from each other (e.g., all-black or all-white).
+- This "Precision" is exactly what we learned in the marble example: we learned the bags were "low precision" (highly variable)
+
+:::
+
+We have $i$ bags of marbles, where $y_i$ is the number of black marbles observed and $n_i$ is the total marbles drawn.
+
+::::: columns
+::: {.column width="65%"}
+**Level 1 – Data**
+:::
+
+::: {.column width="35%"}
+$d_i:  \big\{y_i, n_i \big\}$
+:::
+:::::
+
+::::: columns
+::: {.column width="65%"}
+**Level 2 – Bag-specific distribution**
+:::
+
+::: {.column width="35%"}
+$y_i ~ \big| ~ n_i \sim \text{Binom}(\theta_i)$
+:::
+:::::
+
+::::: columns
+::: {.column width="65%"}
+**Level 3 – General knowledge about bags**
+
+Reparamerization as
+
+-   Expected value $\frac{\alpha}{\alpha + \beta}$ of $\theta_i$
+-   Precision $\alpha + \beta$ capturing concentration of probability mass around its mean (inverse of variance)
+:::
+
+::: {.column width="35%"}
+$\theta_i \sim \text{Beta}(\alpha, \beta)$
+
+![](/img/beta_distribution_tour.gif)
+
+:::
+:::::
+
+
+## Formalizing the Problem {auto-animate="true"}
+
+::: {.notes}
+
+- Finally, to complete the Bayesian model, we need a prior for these top-level parameters.
+- We want to start with as few assumptions as possible.
+- We place a Uniform Prior on the mean—meaning prior to seeing any data, we assume the average color could be anything.
+- We place an Exponential Prior on the precision. This acts as a "soft" bias towards simpler, lower-count distributions, unless the data strongly tells us otherwise.
+- This completes the hierarchy. We have connected the raw data ($y$) all the way up to the abstract hyperparameters.
+
+:::
+
+We have $i$ bags of marbles, where $y_i$ is the number of black marbles observed and $n_i$ is the total marbles drawn.
+
+::::: columns
+::: {.column width="65%"}
+**Level 1 – Data**
+:::
+
+::: {.column width="35%"}
+$d_i:  \big\{y_i, n_i \big\}$
+:::
+:::::
+
+::::: columns
+::: {.column width="65%"}
+**Level 2 – Bag-specific distribution**
+:::
+
+::: {.column width="35%"}
+$y_i ~ \big| ~ n_i \sim \text{Binom}(\theta_i)$
+:::
+:::::
+
+::::: columns
+::: {.column width="65%"}
+**Level 3 – General knowledge about bags**
+:::
+
+::: {.column width="35%"}
+$\theta_i \sim \text{Beta}(\alpha, \beta)$
+:::
+:::::
+
+::::: columns
+::: {.column width="65%"}
+**Level 4 – Hyperparameters**
+:::
+
+::: {.column width="35%"}
+$\frac{\alpha}{\alpha + \beta} \sim \text{Unif}(0, 1)$
+
+$\alpha + \beta \sim \text{Exp}(1)$
+:::
+:::::
+
+## Formalizing the Problem {auto-animate="true"}
+
+::: {.notes}
+
+- Finally, to complete the Bayesian model, we need a prior for these top-level parameters.
+- We want to start with as few assumptions as possible.
+- We place a Uniform Prior on the mean—meaning prior to seeing any data, we assume the average color could be anything.
+- We place an Exponential Prior on the precision. This acts as a "soft" bias towards simpler, lower-count distributions, unless the data strongly tells us otherwise.
+- This completes the hierarchy. We have connected the raw data ($y$) all the way up to the abstract hyperparameters.
+
+:::
+
+We have $i$ bags of marbles, where $y_i$ is the number of black marbles observed and $n_i$ is the total marbles drawn.
+
+::::: columns
+::: {.column width="65%"}
+**Level 1 – Data**
+:::
+
+::: {.column width="35%"}
+$d_i:  \big\{y_i, n_i \big\}$
+:::
+:::::
+
+::::: columns
+::: {.column width="65%"}
+**Level 2 – Bag-specific distribution**
+:::
+
+::: {.column width="35%"}
+$y_i ~ \big| ~ n_i \sim \text{Binom}(\theta_i)$
+:::
+:::::
+
+::::: columns
+::: {.column width="65%"}
+**Level 3 – General knowledge about bags**
+:::
+
+::: {.column width="35%"}
+$\theta_i \sim \text{Beta}(\alpha, \beta)$
+:::
+:::::
+
+::::: columns
+::: {.column width="65%"}
+**Level 4 – Hyperparameters**
+
+-   Prior of Beta Distribution
+-   Uniform prior of $\frac{\alpha}{\alpha + \beta}$ implies that every average probability of drawing a black marbles is equally likely prior to seeing any data
+-   Exponential distribution of $\alpha + \beta$ implies that smaller values are more likely prior to seeing any data
+:::
+
+::: {.column width="35%"}
+$\frac{\alpha}{\alpha + \beta} \sim \text{Unif}(0, 1)$
+
+$\alpha + \beta \sim \text{Exp}(1)$
+
+![](figures/priors.png)
+:::
+:::::
+
+## Formalizing the Problem {auto-animate="true"}
+
+We have $i$ bags of marbles, where $y_i$ is the number of black marbles observed and $n_i$ is the total marbles drawn.
+
+::::: columns
+::: {.column width="65%"}
+**Level 1 – Data**
+:::
+
+::: {.column width="35%"}
+$d_i:  \big\{y_i, n_i \big\}$
+:::
+:::::
+
+::::: columns
+::: {.column width="65%"}
+**Level 2 – Bag-specific distribution**
+:::
+
+::: {.column width="35%"}
+$y_i ~ \big| ~ n_i \sim \text{Binom}(\theta_i)$
+:::
+:::::
+
+::::: columns
+::: {.column width="65%"}
+**Level 3 – General knowledge about bags**
+:::
+
+::: {.column width="35%"}
+$\theta_i \sim \text{Beta}(\alpha, \beta)$
+:::
+:::::
+
+::::: columns
+::: {.column width="65%"}
+**Level 4 – Hyperparameters**
+:::
+
+::: {.column width="35%"}
+$\frac{\alpha}{\alpha + \beta} \sim \text{Unif}(0, 1)$
+
+$\alpha + \beta \sim \text{Exp}(1)$
+:::
+:::::
+
+## Posterior Inference of HBM {auto-animate="true"}
+
+::: {.notes}
+
+[Top Equation: The Structure]
+
+- Now that we have formalized our intuition in a probabilistic model that captures that hierarchical structure of the data, the next question we should ask ourselfs: How do we estimate this model?
+- Well, we apply Bayes' rule 
+- The Posterior distribution is "simply" the product of the levels we just built: The Hyperprior (Level 4), the Conditional Prior (Level 3), and the Likelihood (Levels 1 & 2).
+
+[Bottom Equation: The Mechanism]
+
+- The second equation is where the magic happens. 
+- We want to predict $\theta_i$ for a specific bag.
+- Since we don't know the "true" $\alpha$ and $\beta$, we don't just guess one value.
+- Instead, this integral averages over all possible values of $\alpha$ and $\beta$, weighted by how likely they are given the data ($d_1 \dots d_n$).
+- 
+[Key Takeaway]
+
+This is the mathematical definition of "Sharing Statistical Strength."By integrating out $\alpha$ and $\beta$, the data from all previous bags flows down to influence the prior for the current bag
+
+:::
+
+
+::: {.fragment}
+
+Applying Bayes Formula to HBM
+
+$$
+\begin{gathered}
+\overbrace{P(\theta, \alpha, \beta ~ | ~ y)}^{\text{Posterior}} \propto 
+\underbrace{P(\alpha, \beta)}_{\text{Hyperprior}} \overbrace{P(\theta ~ | ~ \alpha, \beta)}^{\text{Conditional Prior}} \underbrace{P(y ~ | ~ \theta, \alpha, \beta)}_{\text{Likelihood}}
+\end{gathered}
+$$
+
+:::
+
+::: {.fragment}
+
+Posterior inference regarding $\theta_i$ by integrating out $\alpha$ and $\beta$
+
+$$
+\begin{align*}
+P(\theta_i ~ | ~ d_1, \dots, d_n) =   
+\iint P(\theta_i ~ | ~ \alpha, \beta, d_i) P(\alpha, \beta ~ | ~ d_1, \dots, d_n) \,d\alpha  \,d \beta 
+\end{align*}
+$$
+
+:::
+
+## Implementation {auto-animate="true" .hidden}
+
+Numerical integration of equation approximated using Markov Chain Monte Carlo (MCMC) methods, e.g., Hamiltonian-Monte-Carlo (HMC) using STAN:
+
+```{r stan-code}
+#| class-output: stan
+#| echo: false
+#| classes: small_codeblock
+
+cat(readLines("stan/beta-binomial.stan"), sep = "\n")
+
+```
+
+## Applying the Model to the Marbles Example {.nocenter}
+
+::: {.notes}
+
+- These are the results of fitting the model we formalized using HMC with STAN to the marble data I showed you
+- We read the model hierarchy from left to right 
+  - On the left you see a repetition of the marbles we obtained
+  - The middle panel shows the posterior distributions of $\theta_i$ parameters for each bag (y-axis)
+  - The right panel shows the posterior distributions for the hyperparameters $\mu$ and $\phi$
+- Figures show learning from the 7 previous bags of marbles incluences the inference about the new bag from which the single black marble was drawn
+- If we zoom in on the posterior distribution for $\theta_8$ for the 8th bag, we see that the hierachical bayesian model captures our intuition $\rightarrow$ high certainty that probability of drawing a black marble is near one for the 8th bag
+- How was the model able to make this inference? To find out we have to look that the level three inferences about the $\alpha$ and $\beta$ variables [Zoom in]
+- Posterior on $\alpha + \beta$ is close to zero, which means that the learned the overhypothesis that the bags tend to be homogenous in color
+- Posterior on $\alpha / (\alpha + \beta)$ is centered around 0.5, which means that roughly half of the marble in the population of bags will be black and half white.
+
+  
+Second figure:
+
+- To show what the model would predict, if it had seen different data, I additionally simulate a second marble scenario
+- What you can see in the left panel, two key aspects:
+  - On average there seems to be less than 50% black marbles across the bags (in the first example it was roughly 50%)
+  - The bags are now way less homogenous $\rightarrow$ there tend to be both white and black marbles in each bag
+
+- The shift in the average probability of drawing a black marble is reflected in the $\alpha / (\alpha + \beta)$, which is now shifted to the left of 0.5 $\rightarrow$ model has inferred that there are fewer black marbles that white marbles across the entire population of bags
+- The posterior distribution of $\alpha + \beta$ indicates that in comparison to the previous example, the parameters are relatively larger (greater than 1), which indicates that the bags of marbles are expected to contain a mix of black and white marbles (so they are heterogeneous)
+- This explains why now the model predicts in the posterior distribution for $\theta_8$, that the probability of drawing a black marble in bag 8 is probably not close to 1, and additionally there is high uncertainty
+
+:::
+
+::: panel-tabset
+### Scenario I
+
+![][10]
+
+### Scenario II
+
+![][11]
+:::
+
+## Interim Summary {auto-animate="true"}
+
+::: {.notes}
+
+- What's the key take away?
+- HBMs nicely captured our gut feeling about the inferences of the marble color
+- Most importantly: Example demonstrated how HBMs can use structured data to form strong overhypotheses
+- Why do these strong overhypotheses matter?
+- Because this is what allows us to learn from such sparse data like in the example 
+- In extreme forms like in the example $\rightarrow$ One-Shot Learning, where we only observe a single data point and have to make accurate predictions
+- Now, let's see if this same "Marble Logic" can explain how children learn categories
+
+:::
+
+**Key Takeaway**
+
+Marble example demonstrated that HBMs nicely align with our intuition how structured data can be used to form strong overhypotheses.
+
+<br>
+
+*Why does this matter?*
+
+This abstract knowledge is what enables rapid learning from sparse data and one-shot generalization.
+
+# Application of HBMs to <br> *Category Learning* {.dark-theme}
+
+::: {.notes}
+
+- The first example (marbles) was intuitive but not directly applicable to _real-world_ world learning. 
+-  We now turn to an example where **hierarchical Bayesian models** can be applied to how children learn word categories from **a single labeled example**
+-  In principle just like we had a single test case of a black marble in the 8th bag and could strongly generalize when there is rich information in higher levels of abstraction
+
+:::
+
+##  {auto-animate="true"}
+
+![][12]
+
+## Motivating Example {auto-animate="true"}
+
+:::::: columns
+::: column
+
+![][12]{fig-align="center" width="60%"}
+
+:::
+
+:::: column
+
+A mother points to an unfamiliar object lying on the counter and tells her child that this is a *pen.*
+
+::::
+::::::
+
+::: {.fragment}
+**Question**
+
+By which features do children generalize the concept of a pen and recognize future instances of a pen as a pen?
+:::
+
+
+
+::: fragment
+-   In principle, the child could generalize the word to objects with the *same material*, *same color*, *same texture*, or simply *objects lying on the counter*
+-   But empirically, children tend to generalize the new word to other objects that share the **shape**
+:::
+
+:::: fragment
+:::: larger
+::: callout-important
+### Shape Bias
+
+The expectation that members of a category tend to be similar in shape, which is learned by the age of 24 months [@smith2002].
+:::
+::::
+::::
+
+## Model Adaption
+
+::: {.notes}
+
+- Next question becomes how we can use the same modeling ideas from the first example and adapt it model the shape bias of children?
+
+:::
+
+
+
+```{r}
+#| label: model-changes
+#| tbl-cap: Overview of Changes
+
+data.frame(
+  id = c("Structuring Variable", "Data", "Features", "Feature Values"),
+  marble = c("Bag", "Marble", "Color", "Binary"),
+  shape = c("Object Category", "Object Exemplar", "Shape, Color, Texture, Size, etc.", "Categorical")
+) |>
+  kbl(
+    align = "c",
+    col.names = NULL,
+    #table.attr = "style='width:50%;'"
+  ) |> 
+  add_header_above(c(" " = 1, "Marble Example" = 1, "Shapes Example")) |>
+  column_spec(2:3, background = "#f0f0f0") |> 
+  kable_styling(
+    #full_width = FALSE,
+    position = "center"
+  ) 
+
+```
+
+- **Level 1**: Binary Observations $\rightarrow$ Categorical Observations
+- **Level 2**: Binomial Distribution $\rightarrow$ Multinomial Distribution
+- **Level 3**: Beta Distribution Prior $\rightarrow$ Dirichlet Prior
+- **Level 4**: Hyperprior similar to before
+
+Copies of level 2-4. for each Feature Dimension (Color, Shape, Texture, Size)
+
+## Model Adaption
+
+::: {layout-ncol=2}
+
+- The model infers that categories are consistent in shape (low variance) but variable in color (high variance).
+- This learned structure creates a strong prior expectation that any new category will also be homogeneous in shape.
+- Consequently, the model enables rapid generalization of novel labels based on shape similarity, effectively ignoring differences in color.
+
+![][13]
+
+:::
+
+
+
+
+
+## Application to Noun Generalization Task
+
+@glassen2016 @griffiths2024 @kemp2007
+
+```{r smith2002-data}
+
+smith2002 <- tribble(
+  ~feature, ~c11, ~c21, ~c12, ~c22, ~c13, ~c23, ~c14, ~c24,
+  "Category", 1, 1, 2, 2, 3, 3, 4, 4,
+  "Shape",    1, 1, 2, 2, 3, 3, 4, 4,
+  "Texture",  1, 2, 3, 4, 5, 6, 7, 8,
+  "Color",    1, 2, 3, 4, 5, 6, 7, 8,
+  "Size",     1, 2, 1, 2, 1, 2, 1, 2
+)
+
+# Create table with spanners
+table_training <- smith2002 |>
+  kbl(
+    align = "c",
+    col.names = NULL,
+    #caption = "Smith (2002) Table",
+  ) |>
+  add_header_above(c(" " = 1, "1" = 2, "2" = 2, "3" = 2, "4" = 2)) |>
+  column_spec(2:3, background = "#f0f0f0") |> 
+  column_spec(4:5, background = "#ffffff") |>  
+  column_spec(6:7, background = "#f0f0f0") |>  
+  column_spec(8:9, background = "#ffffff") |>  
+  kable_styling(
+    full_width = FALSE,
+    position = "center"
+  ) 
+
+smith2002_testing <- tribble(
+  ~test, ~t1, ~t2, ~t3,
+  5, NA, NA, NA,
+  5, 5, 6, 6, 
+  9, 10, 9, 10, 
+  9, 10, 10, 9, 
+  1, 1, 1, 1
+)
+
+table_testing <- smith2002_testing |>
+  mutate(feature = c("Category", "Shape", "Texture", "Color", "Size"), .before = 1) |>
+  kbl(
+    align = "c",
+    col.names = NULL,
+    #caption = "Testing",
+    table.attr = "style='width:50%;'"
+  ) |> 
+  add_header_above(c(" " = 1, 
+                     "'Dax'" = 1, "Object 1" = 1, "Object 2" = 1, "Object 3" = 1)) |>
+  column_spec(2, background = "#f0f0f0") |> 
+  kable_styling(
+    full_width = FALSE,
+    position = "center"
+  ) 
+
+```
+
+::::::::: columns
+::::: column
+::: fragment
+```{r table-training}
+#| label: tbl-training
+#| tbl-cap: Training Data 
+table_training
+```
+:::
+
+::: fragment
+-   Two exemplar per category (columns)
+-   Different feature dimensions (shape, texture, color size)
+-   Pairs of objects belonging to the same category share the same shape!
+:::
+:::::
+
+::::: column
+::: fragment
+```{r table-testing}
+#| label: tbl-testing
+#| tbl-cap: Testing Data 
+table_testing
+```
+:::
+
+::: fragment
+After training, children (and the model) encounter a new object with a novel noun *"dax"*.
+
+**Task**: Which of the three candidates with unkown label categories is most likely to be a dax?
+:::
+:::::
+:::::::::
+
+Data based on @smith2002
+
+## Results of Noun Generalization Task
+
+::::: columns
+::: column
+-   19-month-olds who received the structured training choose the shape match
+-   Untrained 19-month-olds choose randomly
+-   The hierarchical Bayesian model shows the same preference pattern as trained children
+:::
+
+::: column
+![][14]
+:::
+:::::
+
+## Summary
+
+Test
+
+## References
+
+  [1]: /figures/single/marbles_1_phi_0.8.png
+  [2]: /figures/single/marbles_2_phi_0.8.png
+  [3]: /figures/single/marbles_3_phi_0.8.png
+  [4]: /figures/single/marbles_4_phi_0.8.png
+  [5]: /figures/single/marbles_5_phi_0.8.png
+  [6]: /figures/single/marbles_6_phi_0.8.png
+  [7]: /figures/single/marbles_7_phi_0.8.png
+  [8]: /figures/single/marbles_8_phi_0.8.png
+  [9]: /figures/priors.png
+  [10]: /figures/combined_phi_0.8.svg
+  [11]: /figures/combined_phi_20.svg
+  [12]: /img/pen.png
+  [13]: /img/hierarchy_category-learning.png
+  [14]: /img/dax.png

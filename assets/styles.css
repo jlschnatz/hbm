@@ -171,3 +171,20 @@
         color: black;
     }
 }
+
+
+.title {
+  font-size: 1.6em !important;
+}
+
+.quarto-title-author-name {
+  font-size: 1em;
+}
+
+.quarto-title-subtitle {
+  font-size: 1.3empx;
+}
+
+.quarto-title-institute {
+  font-size: 1.3empx;
+}
