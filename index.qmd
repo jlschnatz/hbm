@@ -4,7 +4,7 @@ subtitle: An Introduction to HBMs and their Application to Category Learning"
 author: "Jan Luca Schnatz"
 format:
   revealjs:
-    slide-number: true
+    slide-number: false
     css: assets/styles.css
     chalkboard: false
     center-title-slide: true
@@ -631,12 +631,27 @@ Second figure:
 
 ## Interim Summary {auto-animate="true"}
 
-*How did the model solve the marble problem?*
+::: {.notes}
 
--   Concept of abstraction of inference into multiple layers of learning
--   Forming an overhypothesis from lower levels
--   Model aquired inductive bias: *Homogenous history* (Bags are usually one color) vs. *mixed history* (Bags are usually mixed)
--   Learned bias allows for string inferences about new bag given only a single observation (one-shot learning)
+- What's the key take away?
+- HBMs nicely captured our gut feeling about the inferences of the marble color
+- Most importantly: Example demonstrated how HBMs can use structured data to form strong overhypotheses
+- Why do these strong overhypotheses matter?
+- Because this is what allows us to learn from such sparse data like in the example 
+- In extreme forms like in the example $\rightarrow$ One-Shot Learning, where we only observe a single data point and have to make accurate predictions
+- Now, let's see if this same "Marble Logic" can explain how children learn categories
+
+:::
+
+**Key Takeaway**
+
+Marble example demonstrated that HBMs nicely align with our intuition how structured data can be used to form strong overhypotheses.
+
+<br>
+
+*Why does this matter?*
+
+This abstract knowledge is what enables rapid learning from sparse data and one-shot generalization.
 
 # Application of HBMs to <br> *Category Learning* {.dark-theme}
 
@@ -648,7 +663,7 @@ Second figure:
 
 :::
 
-## Motivating Example {auto-animate="true"}
+##  {auto-animate="true"}
 
 ![][12]
 
@@ -656,19 +671,25 @@ Second figure:
 
 :::::: columns
 ::: column
-![][12]
+
+![][12]{fig-align="center" width="60%"}
+
 :::
 
 :::: column
+
 A mother points to an unfamiliar object lying on the counter and tells her child that this is a *pen.*
 
-::: callout-tip
-### Question
-
-By which features do children generalize of a pen and recognize future instances?
-:::
 ::::
 ::::::
+
+::: {.fragment}
+**Question**
+
+By which features do children generalize the concept of a pen and recognize future instances of a pen as a pen?
+:::
+
+
 
 ::: fragment
 -   In principle, the child could generalize the word to objects with the *same material*, *same color*, *same texture*, or simply *objects lying on the counter*
@@ -676,30 +697,70 @@ By which features do children generalize of a pen and recognize future instances
 :::
 
 :::: fragment
+:::: larger
 ::: callout-important
 ### Shape Bias
 
 The expectation that members of a category tend to be similar in shape, which is learned by the age of 24 months [@smith2002].
 :::
 ::::
+::::
 
 ## Model Adaption
 
-|      Marble World       |              Cognitive World               |
-|:-----------------------:|:------------------------------------------:|
-|         **Bag**         |         **Category** (e.g., "Dax")         |
-|       **Marble**        |            **Object Exemplar**             |
-| **Color** (Black/White) | **Feature Value** (Round/Square, Red/Blue) |
+::: {.notes}
 
-:::: fragment
-::: callout-note
-### The Structural Shift
+- Next question becomes how we can use the same modeling ideas from the first example and adapt it model the shape bias of children?
 
-Real objects aren't just "Black or White." They are multi-dimensional. We must expand the model from **Binary** (Beta-Binomial) to **Multinomial** (Dirichlet-Multinomial).
 :::
-::::
+
+
+
+```{r}
+#| label: model-changes
+#| tbl-cap: Overview of Changes
+
+data.frame(
+  id = c("Structuring Variable", "Data", "Features", "Feature Values"),
+  marble = c("Bag", "Marble", "Color", "Binary"),
+  shape = c("Object Category", "Object Exemplar", "Shape, Color, Texture, Size, etc.", "Categorical")
+) |>
+  kbl(
+    align = "c",
+    col.names = NULL,
+    #table.attr = "style='width:50%;'"
+  ) |> 
+  add_header_above(c(" " = 1, "Marble Example" = 1, "Shapes Example")) |>
+  column_spec(2:3, background = "#f0f0f0") |> 
+  kable_styling(
+    #full_width = FALSE,
+    position = "center"
+  ) 
+
+```
+
+- **Level 1**: Binary Observations $\rightarrow$ Categorical Observations
+- **Level 2**: Binomial Distribution $\rightarrow$ Multinomial Distribution
+- **Level 3**: Beta Distribution Prior $\rightarrow$ Dirichlet Prior
+- **Level 4**: Hyperprior similar to before
+
+Copies of level 2-4. for each Feature Dimension (Color, Shape, Texture, Size)
+
+## Model Adaption
+
+::: {layout-ncol=2}
+
+- The model infers that categories are consistent in shape (low variance) but variable in color (high variance).
+- This learned structure creates a strong prior expectation that any new category will also be homogeneous in shape.
+- Consequently, the model enables rapid generalization of novel labels based on shape similarity, effectively ignoring differences in color.
 
 ![][13]
+
+:::
+
+
+
+
 
 ## Application to Noun Generalization Task
 
