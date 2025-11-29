@@ -118,16 +118,6 @@ Wir ziehen aus $i$ Murmelbeuteln, wobei $y_i$ die Anzahl an gezogenen schwarzen 
 
 ## Formalisierung des Problems {auto-animate="true"}
 
-::: {.notes}
-
-- Level 1 represents the raw data
-- For any specific bag $i$, we draw a total of $n$ marbles.
-- We observe that $y$ of them are black.
-- This gives us our dataset $d_i$ for that specific bag.
-- At this level, we are just counting what we see.
-
-:::
-
 Wir ziehen aus $i$ Murmelbeuteln, wobei $y_i$ die Anzahl an gezogenen schwarzen Murmel und $n_i$ die ingesamt gezogenen Murmeln repräsentiert.
 
 :::::: {.columns .valign}
