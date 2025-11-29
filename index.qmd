@@ -261,7 +261,7 @@ $\theta_i \sim \text{Beta}(\alpha, \beta)$
 - Reparametrisierung ermöglicht leichtere Interpretationd der Parameter
 - Mittelwertsparameter $\frac{\alpha}{\alpha+\beta}$ beschreibt die mittlere Wahrscheinlichkeit einen schwarze Murmel zu ziehen über die Population an Beuteln hinweg
 - Präzision ($\alpha + \beta$) beschreibt wie homogen oder heterogen die Farbverteilung innerhalb der Beutel ist
-  - Hohe Werte $\rightarrrow$ gemischte Farben in Beutel (Verteilung streut nur gering um ihren Mittelwert, kleine Varianz)
+  - Hohe Werte $\rightarrow$ gemischte Farben in Beutel (Verteilung streut nur gering um ihren Mittelwert, kleine Varianz)
   - Niedrige Werte $\rightarrow$ homogene Farben innerhalb von Beutel (alle-weiß / alle-schwarz)
 
 :::
@@ -364,11 +364,10 @@ $\alpha + \beta \sim \text{Exp}(1)$
 
 ::: {.notes}
 
-- Finally, to complete the Bayesian model, we need a prior for these top-level parameters.
-- We want to start with as few assumptions as possible.
-- We place a Uniform Prior on the mean—meaning prior to seeing any data, we assume the average color could be anything.
-- We place an Exponential Prior on the precision. This acts as a "soft" bias towards simpler, lower-count distributions, unless the data strongly tells us otherwise.
-- This completes the hierarchy. We have connected the raw data ($y$) all the way up to the abstract hyperparameters.
+- Diese Parameter brauchen den bayesianischen Approach wiederum eigene Prior, sog. Hyperprior
+- Nur sehr wenige Grundannahmen, bevor wir Daten gesehen haben
+- Uniformer Prior für $\alpha / (\alpha + \beta)$ bedeutet jede mögliche mittlere Wahrscheinlichkeit eine schwarze Kugel zu ziehen ist gleich wahrshceinlich
+- Exponentieller Prior über $\alpha + \beta$ $\rightarrow$ Bias in Richtung kleinere Werte des Parameters (Tendenz für homogene Beutel)
 
 :::
 
@@ -505,6 +504,26 @@ $$
 
 ## Anwendung des Modells auf das Murmelbeispiel {.nocenter}
 
+::: {.notes}
+
+- Abbildungen sind in der Hierarchie von links nach rechts zu lesen 
+  - Daten
+  - Posteriore Verteilungen über die Wahscheinlichkeit eine schwarze Murmel zu ziehen für jeden Murmelbeutel
+  - Posteriore Verteilung der Hyperparameter 
+
+- Modell bildet unsere Intuition ab $\rightarrow$ Modell schlussfolgert für achten Beutel eine Wahrscheinlichkeit $\theta_8$ von nahezu 1
+- Wie konnte das Modell diese genaue Vorhersage machen?
+- Dafür auf die höchste Ebene schauen $\rightarrow$ Kleine Werte für Precision-Parameter $\alpha + \beta$ U-förmige Verteilung; Modell schlussfolgert, dass Beutel homogen bezüglich Farbe sind
+- Zusammendfassend: Durch Observationen auf niedrigere Ebene konnte auf höherere Abstraktionsebene eine Generalisierung entstehen und auf Basis dieser Generalisierung als Prior können Präzise Vorhersagen für wenige Datenpunkte neuen Beute gemacht werden
+
+- Zu Zweiter Abbildung (hin und her switchen, um Kontrast zu zeigen)
+- Es verändern sich auf Ebene der Modellparameter im wesentliche zwei Aspekte
+  - Kleinerer mittlere Wahrscheinlichkeit eine schwarze Murmel zu ziehen $\alpha / (\alpha + \beta)$
+  - Höheres Präzisionsparameter $\alpha + \beta$ $\rightarrow$ Modell hat gelernt, dass Beutel heterogen sind
+- Und weil Beutel heterogen sind, kann auf Ebene zwei für den achten Beutel keine gute Vorhersage gemacht werden, weil der einen Datenpunkt uns fast keine Information liefert
+
+:::
+
 ::: panel-tabset
 ### Szenario 1
 
@@ -575,12 +594,6 @@ Die Erwartung, dass Mitglieder einer Kategorie tendenziell eine ähnliche Form h
 
 ## Adapation des Hierarchischen Beta-Binomialen Modells
 
-::: {.notes}
-
-- Next question becomes how we can use the same modeling ideas from the first example and adapt it model the shape bias of children?
-
-:::
-
 
 ```{r}
 #| label: model-changes
@@ -605,6 +618,7 @@ data.frame(
 ```
 
 Nach @kemp2007:
+
 - **Level 1**: Binäre Beobachtungen $\rightarrow$ Kategoriale Beobachtungen
 - **Level 2**: Binomialverteilung $\rightarrow$ Multinomialverteilung
 - **Level 3**: Beta-Prior $\rightarrow$ Dirichlet-Prior
