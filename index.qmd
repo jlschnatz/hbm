@@ -639,7 +639,7 @@ Nach @kemp2007:
 :::
 
 
-## Anwendung auf die Nomen-Generalisisation
+## Anwendung auf die Nomen-Generalisation
 
 
 ```{r smith2002-data}
@@ -735,13 +735,13 @@ Nach dem Training stoßen Kinder (und das Modell) auf ein neues Objekt mit dem n
 
 Basierend auf Daten von @smith2002
 
-## Results of Noun Generalization Task
+## Ergebnisse 
 
 ::::: columns
 ::: column
 - 19 Monate alte Kinder, die das strukturierte Training erhielten, wählen das Objekt mit **gleicher Form** $\rightarrow$ Shape Bias
 - Untrainierte 19 Monate alte Kinder wählen **zufällig**
-- HBM wist gleichen **Präferenzmuster wie die trainierten Kinder** auf
+- HBM weist gleichen **Präferenzmuster wie die trainierten Kinder** auf
 
 :::
 
@@ -756,17 +756,17 @@ Hierarchische Bayes-Modelle zeigen, dass **induktive Biases** (wie der Shape Bia
 
 ## Literatur
 
-  [1]: /figures/single/marbles_1_phi_0.8.png
-  [2]: /figures/single/marbles_2_phi_0.8.png
-  [3]: /figures/single/marbles_3_phi_0.8.png
-  [4]: /figures/single/marbles_4_phi_0.8.png
-  [5]: /figures/single/marbles_5_phi_0.8.png
-  [6]: /figures/single/marbles_6_phi_0.8.png
-  [7]: /figures/single/marbles_7_phi_0.8.png
-  [8]: /figures/single/marbles_8_phi_0.8.png
-  [9]: /figures/priors.png
-  [10]: /figures/combined_phi_0.8.svg
-  [11]: /figures/combined_phi_20.svg
+  [1]: /figures/single/dotplot_mu0.5_phi0.8_1.svg
+  [2]: /figures/single/dotplot_mu0.5_phi0.8_2.svg
+  [3]: /figures/single/dotplot_mu0.5_phi0.8_3.svg
+  [4]: /figures/single/dotplot_mu0.5_phi0.8_4.svg
+  [5]: /figures/single/dotplot_mu0.5_phi0.8_5.svg
+  [6]: /figures/single/dotplot_mu0.5_phi0.8_6.svg
+  [7]: /figures/single/dotplot_mu0.5_phi0.8_7.svg
+  [8]: /figures/single/dotplot_mu0.5_phi0.8_8.svg
+  [9]: /figures/hyperpriors.svg
+  [10]: /figures/panel_mu0.5_phi0.8.svg
+  [11]: /figures/panel_mu0.2_phi20.svg
   [12]: /img/pen.png
   [13]: /img/hierarchy_category-learning.png
   [14]: /img/dax.png

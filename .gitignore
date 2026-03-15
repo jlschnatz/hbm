@@ -3,3 +3,7 @@
 .luarc.json
 .vscode/
 /.quarto/
+
+**/*.quarto_ipynb
+.Renviron
+.Rprofile

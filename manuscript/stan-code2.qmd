@@ -1,0 +1,19 @@
+---
+fontsize: 11pt
+monofont: Hasklig
+format: 
+  pdf:
+    geometry:
+         - paperwidth=7.5in
+         - paperheight=11.75in
+         - left=0.05in
+         - right=0.05in
+         - bottom=0in
+         - top=0in
+---
+
+\thispagestyle{empty}
+
+```stan
+{{< include "../stan/dirichlet_multinomial.stan" >}}
+```
